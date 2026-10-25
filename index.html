@@ -120,7 +120,7 @@ nav .plus{width:54px;height:54px;border-radius:50%;margin:-22px auto 0;backgroun
 </section>
 <section class="screen" id="s-shop"><h2 class="c">Supplements</h2><div class="promo c sp" id="promo" role="button" tabindex="0"><b>-10%</b><span><i id="pcl">code</i><strong>NASS</strong></span></div><div id="shop"></div></section>
 <section class="screen" id="s-settings"><h2 class="c">Settings</h2>
-<div class="card c set"><div><b>Edit my setup</b><br><small>Name, meals, targets, training</small></div><button class="btn" id="edit">Edit</button></div>
+<div class="card c set" style="display:block"><b>Gemini API key</b><br><small>Stored only on this device</small><div style="display:flex;gap:8px;margin-top:10px"><input id="gk" type="password" autocomplete="off" placeholder="AIza..." style="flex:1;min-width:0;background:#16161a;border:1px solid var(--ln);border-radius:12px;color:var(--tx);padding:10px;font:inherit;font-size:16px"><button class="btn" id="gks">Save</button></div></div><div class="card c set"><div><b>Edit my setup</b><br><small>Name, meals, targets, training</small></div><button class="btn" id="edit">Edit</button></div>
 <div class="card c set"><div><b>Motion effects</b><br><small>3D transitions and light streaks</small></div><button class="tg" data-t="motion" aria-label="Motion effects"></button></div>
 <div class="card c set"><div><b>Reset today’s check-ins</b><br><small>Clears today only</small></div><button class="btn" id="reset" style="color:var(--rd)">Reset</button></div>
 <div class="card c set"><div><b>Erase everything</b><br><small>Deletes all data on this device</small></div><button class="btn" id="all" style="color:var(--rd)">Erase</button></div>
@@ -173,7 +173,34 @@ $("#plus").onclick=()=>{const c=CATS.find(c=>c[0]!="weight"&&items(c[0]).some((_
 
 /* onboarding wizard */
 const opts=v=>Object.entries(WK).map(([g,l])=>`<optgroup label="${g}">${l.map(o=>`<option${o==v?" selected":""}>${o}</option>`).join("")}</optgroup>`).join("");
-function setup(edit){W=JSON.parse(JSON.stringify(S));W.s=0;W.edit=edit;if(!edit){W.meals=[""];W.supps=[]}$("#ob").classList.add("on");step()}
+const GKEY_STORE="ft_gkey",GMODEL="gemini-2.5-flash";
+const TRAIN=[].concat(...Object.values(WK));
+function setup(edit){W=JSON.parse(JSON.stringify(S));W.s=0;W.edit=edit;if(!edit){W.meals=[""];W.supps=[]}$("#ob").classList.add("on");if(!edit)choose();else step()}
+function choose(){$("#ob").innerHTML=`<div class="st"><h1>Your training</h1><p>Do you already have a training plan, or should we create one for you?</p><div style="display:grid;gap:12px;margin-top:18px"><button class="btn" id="ch-own" style="padding:16px;border-radius:16px;border:1px solid var(--ln)">I have my own plan</button><button class="btn" id="ch-ai" style="padding:16px;border-radius:16px;background:var(--rd)">Create one for me</button></div></div>`;$("#ch-own").onclick=()=>step();$("#ch-ai").onclick=()=>ask()}
+function ask(){const k=localStorage.getItem(GKEY_STORE)||"";const sel=(id,arr,def)=>`<select id="${id}">${arr.map(o=>`<option${o==def?" selected":""}>${o}</option>`).join("")}</select>`;
+$("#ob").innerHTML=`<div class="st"><h1>Your plan</h1><p>Answer a few questions. The plan will fill in your check-ins for you to review.</p><label>Gemini API key<input id="qk" type="password" autocomplete="off" value="${esc(k)}"></label><label>Main goal${sel("qg",["Lose fat","Build muscle","Body recomposition","General fitness"],"Lose fat")}</label><label>Experience${sel("qe",["Beginner","Intermediate","Advanced"],"Beginner")}</label><label>Training days per week${sel("qd",[2,3,4,5,6],4)}</label><label>Equipment${sel("qq",["Full gym","Home dumbbells","Bodyweight only"],"Full gym")}</label><label>Meals per day${sel("qm",[3,4,5,6],4)}</label><label>Food preferences or allergies<input id="qf" placeholder="e.g. vegetarian, no dairy"></label><p id="qs" class="mu"></p></div><div class="ft"><button id="qb">Back</button><button class="go" id="qgo">Generate</button></div>`;$("#qb").onclick=()=>choose();$("#qgo").onclick=()=>generate()}
+async function generate(){const key=$("#qk").value.trim(),st=$("#qs");if(!key){st.textContent="Add your Gemini API key first.";return}
+localStorage.setItem(GKEY_STORE,key);st.textContent="Creating your plan…";$("#qgo").disabled=true;
+const ans={goal:$("#qg").value,experience:$("#qe").value,days:+$("#qd").value,equipment:$("#qq").value,mealsPerDay:+$("#qm").value,preferences:$("#qf").value.trim()};
+const prompt=`You create a simple fitness plan. Reply with JSON only, no markdown, exactly in this shape:
+{"plan":[7 strings Monday to Sunday],"meals":[strings],"supps":[strings],"water":number in litres,"steps":integer,"sleep":number in hours}
+Rules:
+- Each plan entry must be exactly one of these labels: ${TRAIN.join(" | ")}. Use "Rest day" on off days. Use exactly ${ans.days} training days spread across the week.
+- "meals" must have exactly ${ans.mealsPerDay} short descriptions with approximate portions.
+- "supps" may be an empty array. Only list well-known basics if they fit the goal.
+- Write meal and supplement text in the language of the preferences text, or English if it is empty.
+User answers: ${JSON.stringify(ans)}`;
+try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GMODEL}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json",temperature:0.6}})});
+if(!r.ok){let m="";try{m=(await r.json()).error.message}catch(x){}throw new Error("Error "+r.status+": "+(m||"no details"))}
+const j=await r.json(),txt=((j.candidates&&j.candidates[0]&&j.candidates[0].content.parts)||[]).map(p=>p.text||"").join("");
+const p=JSON.parse(txt.replace(/```json|```/g,"").trim());
+W.plan=Array.from({length:7},(_,i)=>String((p.plan&&p.plan[i])||"Rest day"));
+W.meals=(p.meals||[]).map(String).slice(0,10).filter(Boolean);if(!W.meals.length)W.meals=[""];
+W.supps=(p.supps||[]).map(String).slice(0,10);
+W.water=+p.water||W.water;W.steps=+p.steps||W.steps;W.sleep=+p.sleep||W.sleep;
+W.s=0;step()}catch(e){st.textContent=e.message||"Could not create the plan. Try again.";$("#qgo").disabled=false}}
+$("#gk").value=localStorage.getItem(GKEY_STORE)||"";
+$("#gks").onclick=()=>{localStorage.setItem(GKEY_STORE,$("#gk").value.trim());$("#gks").textContent="Saved ✓";setTimeout(()=>$("#gks").textContent="Save",1400)};
 const lst=(a,l,ph)=>`<div class="stp"><button data-c="${a}" data-d="-1" aria-label="Fewer">−</button><b>${W[a].length}</b><button data-c="${a}" data-d="1" aria-label="More">+</button></div>`+W[a].map((m,i)=>`<label>${l} ${i+1}<textarea data-a="${a}" data-i="${i}" placeholder="${ph}">${esc(m)}</textarea></label>`).join("");
 function step(){const s=W.s,B=[`<h1>Welcome 👋</h1><p>Let’s set up your tracker.</p><label>Your name<input data-f="name" value="${esc(W.name)}" autocomplete="given-name"></label><label>Transformation period</label><div class="seg">${[90,180,365].map((g,i)=>`<button data-g="${g}" class="${W.goal==g?"on":""}">${["3 months","6 months","12 months"][i]}</button>`).join("")}</div>`,
 `<h1>Meals</h1><p>How many meals a day? Write exactly what’s in each one.</p>`+lst("meals","Meal","e.g. 3 eggs, 80 g oats, 1 banana"),
