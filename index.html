@@ -173,7 +173,7 @@ $("#plus").onclick=()=>{const c=CATS.find(c=>c[0]!="weight"&&items(c[0]).some((_
 
 /* onboarding wizard */
 const opts=v=>Object.entries(WK).map(([g,l])=>`<optgroup label="${g}">${l.map(o=>`<option${o==v?" selected":""}>${o}</option>`).join("")}</optgroup>`).join("");
-const GKEY_STORE="ft_gkey",GMODEL="gemini-2.5-flash";
+const GKEY_STORE="ft_gkey",GMODEL="gemini-3.8-flash";
 const TRAIN=[].concat(...Object.values(WK));
 function setup(edit){W=JSON.parse(JSON.stringify(S));W.s=0;W.edit=edit;if(!edit){W.meals=[""];W.supps=[]}$("#ob").classList.add("on");if(!edit)choose();else step()}
 function choose(){$("#ob").innerHTML=`<div class="st"><h1>Your training</h1><p>Do you already have a training plan, or should we create one for you?</p><div style="display:grid;gap:12px;margin-top:18px"><button class="btn" id="ch-own" style="padding:16px;border-radius:16px;border:1px solid var(--ln)">I have my own plan</button><button class="btn" id="ch-ai" style="padding:16px;border-radius:16px;background:var(--rd)">Create one for me</button></div></div>`;$("#ch-own").onclick=()=>step();$("#ch-ai").onclick=()=>ask()}
