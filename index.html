@@ -173,7 +173,7 @@ $("#plus").onclick=()=>{const c=CATS.find(c=>c[0]!="weight"&&items(c[0]).some((_
 
 /* onboarding wizard */
 const opts=v=>Object.entries(WK).map(([g,l])=>`<optgroup label="${g}">${l.map(o=>`<option${o==v?" selected":""}>${o}</option>`).join("")}</optgroup>`).join("");
-const GKEY_STORE="ft_groq",GMODEL="llama-3.3-70b-versatile";
+const GKEY_STORE="ft_groq",GMODELS=["openai/gpt-oss-120b","llama-3.1-8b-instant","meta-llama/llama-4-scout-17b-16e-instruct"];
 const TRAIN=[].concat(...Object.values(WK));
 function setup(edit){W=JSON.parse(JSON.stringify(S));W.s=0;W.edit=edit;if(!edit){W.meals=[""];W.supps=[]}$("#ob").classList.add("on");if(!edit)choose();else step()}
 function choose(){$("#ob").innerHTML=`<div class="st"><h1>Your training</h1><p>Do you already have a training plan, or should we create one for you?</p><div style="display:grid;gap:12px;margin-top:18px"><button class="btn" id="ch-own" style="padding:16px;border-radius:16px;border:1px solid var(--ln)">I have my own plan</button><button class="btn" id="ch-ai" style="padding:16px;border-radius:16px;background:var(--rd)">Create one for me</button></div></div>`;$("#ch-own").onclick=()=>step();$("#ch-ai").onclick=()=>ask()}
@@ -192,8 +192,8 @@ Rules:
 - "supps" may be an empty array. Only list well-known basics if they fit the goal.
 - Write meal and supplement text in the language of the preferences text, or English if it is empty.
 User answers: ${JSON.stringify(ans)}`;
-try{const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({model:GMODEL,messages:[{role:"user",content:prompt}],temperature:0.6,response_format:{type:"json_object"}})});
-if(!r.ok){let m="";try{m=(await r.json()).error.message}catch(x){}throw new Error("Error "+r.status+" ("+GMODEL+"): "+(m||"no details"))}
+try{let r,used="";for(const M of GMODELS){used=M;r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+key},body:JSON.stringify({model:M,messages:[{role:"user",content:prompt}],temperature:0.6,response_format:{type:"json_object"}})});if(r.status!==404)break}
+if(!r.ok){let m="";try{m=(await r.json()).error.message}catch(x){}throw new Error("Error "+r.status+" ("+used+"): "+(m||"no details"))}
 const j=await r.json(),txt=(j.choices&&j.choices[0]&&j.choices[0].message.content)||"";
 const p=JSON.parse(txt.replace(/```json|```/g,"").trim());
 W.plan=Array.from({length:7},(_,i)=>String((p.plan&&p.plan[i])||"Rest day"));
