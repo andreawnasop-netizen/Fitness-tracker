@@ -1,0 +1,219 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050506"><title>Fitness Tracker</title>
+<style>
+:root{--bg:#050506;--cd:rgba(13,13,16,.8);--ln:rgba(255,255,255,.08);--rd:#ff2230;--tx:#f5f5f7;--mu:#8a8a92;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;overflow-x:hidden;background:radial-gradient(120% 50% at 50% -10%,#1c0509,var(--bg) 60%)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px;width:100%}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:flex-start;padding:20px 22px;mix-blend-mode:normal}
+.logo{font-weight:300;font-size:22px;letter-spacing:.14em;white-space:nowrap}.logo:after{content:"";display:block;width:34px;height:2px;margin-top:6px;background:var(--rd);box-shadow:0 0 10px var(--rd)}
+.sub{font-size:8px;letter-spacing:.38em;color:var(--mu);margin-top:6px}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ff2230,#3a0006);border:1px solid var(--ln);display:grid;place-items:center;font-weight:600}
+section{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+.lbl{color:var(--rd);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+.ghost{position:absolute;left:0;right:0;text-align:center;font-weight:800;font-size:clamp(90px,20vw,240px);line-height:1;letter-spacing:-.04em;white-space:nowrap;color:rgba(255,34,48,.07);-webkit-text-stroke:1px rgba(255,34,48,.2);pointer-events:none;user-select:none}
+.mq{overflow:hidden;white-space:nowrap;font:800 36px/1.1 "Arial Narrow","Helvetica Neue",Impact,sans-serif;text-transform:uppercase;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28);margin:24px -22px 0}
+.mq div{display:inline-block;animation:mq 22s linear infinite}@keyframes mq{to{transform:translateX(-50%)}}
+/* letters */
+.l{display:inline-block;white-space:pre;opacity:0;transform:translateY(.55em) rotate(4deg);transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .9s,filter .9s}
+.in .l,.l.on{opacity:1;transform:none;filter:none}
+.hl{filter:blur(10px)}
+.ic{display:inline-grid;place-items:center;width:.86em;height:.86em;border-radius:50%;border:1px solid rgba(255,34,48,.6);color:var(--rd);vertical-align:middle;margin:0 .08em;background:#16161a;transform:scale(0);transition:transform .8s cubic-bezier(.34,1.56,.64,1)}
+.ic svg{width:52%;height:52%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.in .ic{transform:scale(1)}
+/* hero */
+#hero{align-items:flex-end;padding-bottom:12vh}
+#cloud{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hero-in{position:relative;z-index:2;will-change:transform}
+h1.big{font-size:clamp(44px,9vw,104px);font-weight:500;letter-spacing:-.02em;line-height:.95;text-transform:uppercase}
+h1.big b{color:var(--rd);font-weight:600}
+.hrow{display:flex;align-items:center;gap:16px;margin-top:28px;flex-wrap:wrap}
+.days{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:8px 14px}.days strong{display:block;font-size:30px;font-weight:600;line-height:1}
+.bar{flex:1;min-width:160px;height:5px;border-radius:9px;background:#1c1c20}.bar i{display:block;height:100%;width:12%;border-radius:9px;background:linear-gradient(90deg,#8d0010,var(--rd));box-shadow:0 0 10px rgba(255,34,48,.6)}
+.cta{height:50px;padding:0 34px;border-radius:25px;background:linear-gradient(180deg,#ff3340,#d3101e);font-weight:600;box-shadow:0 8px 30px rgba(255,34,48,.35);margin-top:28px;opacity:0;transform:translateY(16px);transition:.9s .9s cubic-bezier(.2,.8,.2,1)}
+.in .cta{opacity:1;transform:none}
+.fade{position:absolute;inset:auto 0 0;height:60%;background:linear-gradient(transparent,var(--bg) 70%);opacity:0;z-index:1;pointer-events:none}
+/* statement */
+#statement{justify-content:center;text-align:center}
+.stmt{font-size:clamp(40px,7.2vw,118px);font-weight:500;line-height:1.06;letter-spacing:-.02em;text-transform:uppercase;margin:22px 0 0}
+.emb{width:66px;height:66px;margin:36px auto 0;border-radius:50%;border:1px solid var(--rd);display:grid;place-items:center;box-shadow:0 0 22px rgba(255,34,48,.35);transform:rotate(-90deg) scale(.6);opacity:0;transition:transform 1.2s cubic-bezier(.2,.8,.2,1),opacity 1s}
+.emb:after{content:"";position:absolute}.emb svg{width:30px;height:30px;fill:none;stroke:var(--rd);stroke-width:1.8;stroke-linecap:round}
+.in .emb{transform:none;opacity:1}
+/* facts */
+#facts{padding:80px 0}
+.grid3{display:grid;grid-template-columns:1.12fr 1.12fr .96fr;gap:40px;align-items:start;border-top:1px solid var(--ln);padding-top:44px;position:relative}
+.ttl{font-size:clamp(34px,4.25vw,66px);font-weight:500;line-height:.98;text-transform:uppercase;letter-spacing:-.02em;margin:14px 0 26px}
+.badge{width:84px;height:84px;position:relative;margin-top:8px}
+.badge svg{position:absolute;inset:0;width:100%;height:100%;animation:spin 16s linear infinite}
+.badge button{position:absolute;inset:26px;border-radius:50%;background:var(--rd);display:grid;place-items:center;box-shadow:0 0 22px rgba(255,34,48,.5)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cap{font-size:11px;letter-spacing:.2em;color:var(--mu);margin-top:10px;text-transform:uppercase}
+.lead{color:var(--mu);font-size:13.4px;max-width:440px;margin-bottom:22px}
+.facts{width:100%;border-collapse:collapse;font-size:14px}
+.facts td{padding:12px 0;border-top:1px solid var(--ln);opacity:0;transform:translateY(22px);transition:.9s cubic-bezier(.2,.8,.2,1)}
+.facts td:last-child{text-align:right;color:var(--rd);font-weight:500}
+.in .facts td{opacity:1;transform:none}
+.facts tr:nth-child(2) td{transition-delay:.08s}.facts tr:nth-child(3) td{transition-delay:.16s}.facts tr:nth-child(4) td{transition-delay:.24s}.facts tr:nth-child(5) td{transition-delay:.32s}.facts tr:nth-child(6) td{transition-delay:.4s}.facts tr:nth-child(7) td{transition-delay:.48s}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:20px;padding:18px;margin-top:24px}
+.promo{display:flex;align-items:center;gap:16px}
+.promo b{font-size:36px;color:var(--rd);font-weight:600}
+.code{margin-left:auto;background:#16161a;border:1px solid var(--ln);border-radius:12px;padding:10px 14px;font-size:14px;letter-spacing:.14em}
+.prod{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--ln);font-size:13.5px}
+.prod s{color:var(--mu);margin-right:6px}.prod strong{color:var(--tx);font-weight:500}.prod a{color:var(--rd);text-decoration:none;font-size:12px}
+.phone{background:var(--cd);border:1px solid var(--ln);border-radius:34px;padding:22px 18px;box-shadow:0 0 120px rgba(255,34,48,.12);clip-path:inset(100% 0 0 0);transition:clip-path 1.2s cubic-bezier(.2,.8,.2,1)}
+.in .phone{clip-path:inset(0)}
+.phone .it{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:13px}
+.phone .it span{margin-left:auto;color:var(--mu);font-size:12px}
+.phone .done span{color:var(--rd)}
+.phone .chk{width:18px;height:18px;border-radius:50%;border:1.5px solid #4a4a50}.phone .done .chk{background:var(--rd);border-color:var(--rd)}
+.dot{position:absolute;right:20px;top:20px;width:14px;height:14px}
+/* responsive */
+@media(max-width:760px){
+ .grid3{grid-template-columns:1fr;gap:34px}
+ .phone{max-width:320px;margin:0 auto;width:100%}
+ .mq{font-size:26px}
+ nav .logo{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){.l,.cta,.facts td,.phone,.emb,.ic{transition:none;opacity:1;transform:none;filter:none}.mq div,.badge svg{animation:none}}
+</style></head><body>
+
+<nav><div><div class="logo">Fitness Tracker</div><div class="sub">TRACK / IMPROVE / REPEAT</div></div><div class="av" id="av">A</div></nav>
+
+<section id="hero">
+  <canvas id="cloud" aria-hidden="true"></canvas>
+  <div class="wrap hero-in" id="heroIn">
+    <div class="lbl" id="eb">Track / Improve / Repeat</div>
+    <h1 class="big"><span class="split">Hello,</span><br><b class="split">Your name</b></h1>
+    <div class="hrow">
+      <div class="days"><small>Days left</small><strong>90</strong></div>
+      <div class="bar"><i></i></div>
+      <small>12% of your journey</small>
+    </div>
+    <button class="cta">Start my plan</button>
+  </div>
+  <div class="mq" aria-hidden="true" style="position:absolute;left:0;right:0;bottom:4vh;margin:0"><div><span>TRACK · IMPROVE · REPEAT · TRACK · IMPROVE · REPEAT · TRACK · IMPROVE · REPEAT · </span><span>TRACK · IMPROVE · REPEAT · TRACK · IMPROVE · REPEAT · TRACK · IMPROVE · REPEAT · </span></div></div>
+  <div class="fade" id="fade"></div>
+</section>
+
+<section id="statement">
+  <div class="ghost" style="top:10%">STATEMENT</div>
+  <div class="wrap" style="position:relative;z-index:1">
+    <div class="lbl">Eight daily check-ins</div>
+    <h2 class="stmt split-r">Track every<br><span class="ic"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></span> day, one<br>check-in at a time</h2>
+    <div class="emb"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></div>
+  </div>
+</section>
+
+<section id="facts">
+  <div class="ghost" style="top:4%">ABOUT</div>
+  <div class="wrap grid3" id="factsWrap">
+    <div>
+      <div class="lbl">The app</div>
+      <h2 class="ttl split-r">Quick<br>facts<br>about<br>the app</h2>
+      <div class="badge">
+        <svg viewBox="0 0 84 84" id="ticks"></svg>
+        <button aria-label="Play"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z" fill="#fff"/></svg></button>
+      </div>
+      <div class="cap">Set up in 2 minutes</div>
+    </div>
+    <div>
+      <p class="lead">Check in on workouts, meals, supplements, water, steps, sleep, physique and weight every day. Your plan is generated from your answers, and your data stays on your device.</p>
+      <table class="facts">
+        <tr><td>Check-ins</td><td>8 categories</td></tr>
+        <tr><td>Default goal</td><td>90 days (6 or 12 months)</td></tr>
+        <tr><td>Water</td><td>2.5 L per day</td></tr>
+        <tr><td>Steps</td><td>10,000 per day</td></tr>
+        <tr><td>Sleep</td><td>8 hours per night</td></tr>
+        <tr><td>Plan</td><td>AI-generated, bring your own key</td></tr>
+      </table>
+      <div class="card">
+        <div class="promo"><b>-10%</b><small>Use code at checkout</small><button class="code" id="code">NASS</button></div>
+        <div style="margin-top:14px">
+          <div class="prod"><span>Diet + Weight Loss Pack</span><span><s>€63</s><strong>€56.70</strong> <a href="https://www.bodystore.gr/your-goal/i-want-lose-weight/diet-weight-loss-pack.html" target="_blank" rel="noopener">View →</a></span></div>
+          <div class="prod"><span>Strength &amp; Muscle Building combo</span><span><s>€99</s><strong>€89.10</strong> <a href="https://www.bodystore.gr/your-goal/muscle-growth/strength-and-muscle-building-combo.html" target="_blank" rel="noopener">View →</a></span></div>
+          <div class="prod"><span>The Fit Kit</span><span><s>€80</s><strong>€72</strong> <a href="https://www.bodystore.gr/paketa-prosforon/fitkit.html" target="_blank" rel="noopener">View →</a></span></div>
+          <div class="prod"><span>Better Gains</span><span><s>€60</s><strong>€54</strong> <a href="https://www.bodystore.gr/paketa-prosforon/better-gains.html" target="_blank" rel="noopener">View →</a></span></div>
+          <div class="prod"><span>Lean Bulk Set</span><span><s>€60</s><strong>€54</strong> <a href="https://www.bodystore.gr/paketa-prosforon/lean-bulk-set.html" target="_blank" rel="noopener">View →</a></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone" id="phone">
+      <div class="lbl" style="margin-bottom:12px">Today</div>
+      <div class="it"><span class="chk"></span>Workout<span>0/1</span></div>
+      <div class="it done"><span class="chk"></span>Meals<span>3/3</span></div>
+      <div class="it"><span class="chk"></span>Supplements<span>0/2</span></div>
+      <div class="it"><span class="chk"></span>Water<span>1/1</span></div>
+      <div class="it"><span class="chk"></span>Steps<span>6,200</span></div>
+      <div class="it"><span class="chk"></span>Sleep<span>7 h</span></div>
+      <div class="it"><span class="chk"></span>Physique<span>Friday</span></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* split text nodes into letter spans, keeping icon elements intact */
+function split(el,stagger,base=0){let i=0;
+  const walk=n=>[...n.childNodes].forEach(c=>{
+    if(c.nodeType===3){const f=document.createDocumentFragment();for(const ch of c.textContent){const s=document.createElement("span");s.className="l";s.textContent=ch;s.style.transitionDelay=(base+i++*stagger)+"ms";f.appendChild(s)}c.replaceWith(f)}
+    else if(c.nodeType===1&&!c.classList.contains("ic")&&c.tagName!=="BR")walk(c)});
+  walk(el);return i}
+$$(".split").forEach(el=>split(el,95));
+$$(".split-r").forEach(el=>split(el,26));
+/* hero letters start blurred */
+$$("#hero .l").forEach(l=>l.classList.add("hl"));
+
+/* load sequence */
+addEventListener("load",()=>{requestAnimationFrame(()=>{
+  $("#hero").classList.add("in");
+  $$("#hero .l").forEach(l=>{l.classList.remove("hl");l.classList.add("on")});
+});});
+/* reveal on view */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.35});
+["#statement","#factsWrap"].forEach(s=>io.observe($(s)));
+$$("#statement .l").forEach(l=>l.classList.add("on"));
+
+/* hero melts into the background on scroll */
+const hi=$("#heroIn"),fade=$("#fade"),hero=$("#hero");
+function onScroll(){const y=scrollY,h=innerHeight;
+  if(!reduce){hi.style.transform=`translateY(${y*.32}px)`;hi.style.filter=`blur(${Math.min(6,y/h*10)}px)`}
+  const p=Math.min(1,y/(h*.6));fade.style.opacity=p;fade.style.height=(34+66*p)+"%";}
+addEventListener("scroll",onScroll,{passive:true});onScroll();
+
+/* ticks for the play badge */
+const tk=$("#ticks");for(let i=0;i<48;i++){const a=i/48*Math.PI*2,l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",42+Math.cos(a)*36);l.setAttribute("y1",42+Math.sin(a)*36);l.setAttribute("x2",42+Math.cos(a)*(i%4?40:42));l.setAttribute("y2",42+Math.sin(a)*(i%4?40:42));
+  l.setAttribute("stroke",i%4?"#4a4a50":"#ff2230");l.setAttribute("stroke-width","1.2");tk.appendChild(l)}
+
+/* copy promo code */
+$("#code").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText("NASS").catch(()=>{});$("#code").textContent="copied ✓";setTimeout(()=>$("#code").textContent="NASS",1400)};
+
+/* particle cloud: morphs between shapes as sections come into view */
+const cv=$("#cloud"),cx=cv.getContext("2d"),NP=innerWidth<500?700:1100;
+const COL=["255,34,48","255,100,60","255,255,255","255,34,48"];
+const SH=[0,1,2].map(t=>{const a=new Float32Array(NP*3);for(let i=0;i<NP;i++){let x,y,z;const u=Math.random(),v=Math.random(),th=u*6.2832;
+  if(t==0){const f=Math.acos(1-2*(i+.5)/NP),ph=i*2.39996;x=Math.sin(f)*Math.cos(ph);y=Math.cos(f);z=Math.sin(f)*Math.sin(ph)}
+  else if(t==1){const ph=v*6.2832,r=1+.38*Math.cos(ph);x=r*Math.cos(th)*.8;z=r*Math.sin(th)*.8;y=.3*Math.sin(ph)}
+  else{const r=Math.sqrt(u);x=Math.cos(v*6.2832)*r;z=Math.sin(v*6.2832)*r;y=.8-r*1.6}
+  a[i*3]=x;a[i*3+1]=y;a[i*3+2]=z}return a});
+const cur=new Float32Array(SH[0]);let target=0,mx=0,my=0,ang=0,W=1,H=1;
+const RN=Float32Array.from({length:NP},Math.random);
+function size(){const d=Math.min(2,devicePixelRatio||1);W=cv.width=cv.clientWidth*d;H=cv.height=cv.clientHeight*d}
+addEventListener("resize",size);size();
+addEventListener("pointermove",e=>{mx=e.clientX/innerWidth*2-1;my=e.clientY/innerHeight*2-1});
+function targetFromScroll(){const y=scrollY,h=innerHeight;target=y<h*.8?0:y<h*1.8?1:2}
+addEventListener("scroll",targetFromScroll,{passive:true});targetFromScroll();
+function draw(){
+  const a=SH[target];for(let i=0;i<cur.length;i++)cur[i]+=(a[i]-cur[i])*.05;
+  if(!reduce)ang+=.005;
+  cx.clearRect(0,0,W,H);
+  const d=Math.min(2,devicePixelRatio||1),R=Math.min(W,H)*.34,c=Math.cos(ang+mx*.3),s=Math.sin(ang+mx*.3),X=W/2,Y=H*.42+my*12*d;
+  for(let k=0;k<4;k++){cx.fillStyle="rgb("+COL[k]+")";
+    for(let i=k;i<NP;i+=4){const x=cur[i*3],y=cur[i*3+1],z=cur[i*3+2],zr=x*s+z*c,f=2.8/(2.8+zr),sz=(1+RN[i])*f*d*1.25;
+      cx.globalAlpha=Math.min(1,.12+.5*f*f);cx.fillRect(X+(x*c-z*s)*R*f-sz/2,Y+y*R*f-sz/2,sz,sz)}}
+  cx.globalAlpha=1;requestAnimationFrame(draw)}
+draw();
+</script>
+</body></html>
